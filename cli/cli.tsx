@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import React from "react";
+import * as yargs from "yargs";
 import { render } from "ink";
 import { cli } from "./core/utils/index.js";
 import { Provider } from "react-redux";
@@ -12,11 +13,11 @@ import Destroy from "./destroy.js";
 import Eject from "./eject.js";
 import Init from "./init.js";
 
-function renderView(Cmp: React.FC) {
+function renderView(Cmp: React.FC<any>, args?: yargs.ArgumentsCamelCase) {
 	render(
 		<Provider store={store}>
 			<Wrapper>
-				<Cmp />
+				<Cmp cliArgs={args} />
 			</Wrapper>
 		</Provider>
 	);
@@ -43,8 +44,13 @@ app.addCommand({
 app.addCommand({
 	name: "deploy",
 	description: "deploy your project to an environment",
-	options: (yargs) => yargs,
-	handler: (_args) => renderView(Deploy),
+	options: (yargs) => yargs
+		.option("environment", {
+			alias: "e",
+			type: "string",
+			describe: "The environment you want to deploy into."
+		}),
+	handler: (args) => renderView(Deploy, args),
 });
 
 app.addCommand({

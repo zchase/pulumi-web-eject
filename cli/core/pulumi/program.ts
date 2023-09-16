@@ -26,3 +26,9 @@ ${websiteProgram.toString()}
 export const outputs = websiteProgram();
 `;
 }
+
+export function createPulumiYamlString(projectName: string, description: string) {
+    return `name: ${projectName}
+description: ${description}
+runtime: nodejs`;
+}

@@ -3,8 +3,12 @@ import { Text, Box } from "ink";
 import { useAppSelector } from "./store/index.js";
 import { getEnvironments, getConfiguredEnvironments, getProjectName } from "./store/enviroment.js";
 import ConfigureEnvironment from "./components/configureEnv.js";
-import MultiSelect from "./components/multiSelect.js";
+import Select, { SelectOption } from "./components/select.js";
+import MultiSelect, { MultiSelectOption } from "./components/multiSelect.js";
 import WizardStep from "./components/wizardStep.js";
+import TextInput from "./components/textInput.js";
+
+type Cloud = "aws" | "azure" | "gcp";
 
 interface InitProps {
 
@@ -12,6 +16,9 @@ interface InitProps {
 
 const Init: React.FC<InitProps> = ({}) => {
     const [step, setStep] = useState(1);
+    const [cloud, setCloud] = useState<Cloud | undefined>();
+    const [additionalConfig, setAdditionalConfig] = useState<Record<string, string>>({});
+    const [additionalConfigLabel, setAdditionalConfigLabel] = useState("");
     const [environmentsToConfigure, setEnvironmentsToConfigure] = useState<string[]>([]);
     const [activeEnvironment, setActiveEnvironment] = useState("");
     const environments = useAppSelector(getEnvironments);
@@ -19,8 +26,8 @@ const Init: React.FC<InitProps> = ({}) => {
     const projectName = useAppSelector(getProjectName);
 
     useEffect(() => {
-        if (step === 2 && environmentsToConfigure.length === configuredEnvironments.length) {
-            setStep(3);
+        if (step === 4 && environmentsToConfigure.length === configuredEnvironments.length) {
+            setStep(5);
             setTimeout(() => process.exit(0), 500);
         }
     }, [ environments, configuredEnvironments ]);
@@ -40,15 +47,11 @@ const Init: React.FC<InitProps> = ({}) => {
         };
     });
 
-    const handleEnvironmentSubmission = (envs: { label: string; value: string; }[]) => {
-        if (step === 2) {
-            return;
-        }
-
+    const handleEnvironmentSubmission = (envs: MultiSelectOption[]) => {
         const selectedEnvs = envs.map(e => e.value);
         setEnvironmentsToConfigure(selectedEnvs);
         setActiveEnvironment(selectedEnvs[0]!);
-        setStep(2);
+        setStep(4);
     };
 
     const handleEnvironmentConfigured = (env: string) => {
@@ -58,13 +61,70 @@ const Init: React.FC<InitProps> = ({}) => {
         }
     };
 
+    const cloudOptions: SelectOption<Cloud>[] = [
+        { label: "AWS", value: "aws" },
+        { label: "Azure", value: "azure" },
+        { label: "GCP", value: "gcp" },
+    ];
+
+    const handleCloudChosen = (cloud: SelectOption<Cloud>) => {
+        if (cloud.value === "aws") {
+            setAdditionalConfigLabel("AWS region");
+        }
+
+        if (cloud.value === "azure") {
+            setAdditionalConfigLabel("Azure location");
+        }
+
+        if (cloud.value === "gcp") {
+            setAdditionalConfigLabel("Google Cloud project")
+        }
+
+        setCloud(cloud.value);
+        setStep(2);
+    };
+
+    const handleCloudConfig = (value: string) => {
+        const config: Record<string, string> = {};
+
+        if (cloud === "aws") {
+            config["aws:region"] = value;
+        }
+
+        if (cloud === "azure") {
+            config["azure:location"] = value;
+        }
+
+        if (cloud === "gcp") {
+            config["gcp:project"] = value;
+        }
+
+        setAdditionalConfig(config);
+        setStep(3);
+    };
+
     return(
         <Box flexDirection="column">
             <Box marginBottom={1}>
                 <Text>Welcome to pan. Let's configure your project</Text>
             </Box>
 
-            <WizardStep label="Select your environments" active={step === 1} done={step > 1} failed={step > 1 && environmentsToConfigure.length === 0}>
+            <WizardStep label="Pick your cloud" active={step === 1} done={step > 1}>
+                <Select
+                    text="What cloud are you using?"
+                    options={cloudOptions}
+                    handleSubmit={handleCloudChosen}
+                />
+            </WizardStep>
+
+            <WizardStep label="Configure your cloud" active={step === 2} done={step > 2}>
+                <TextInput
+                    label={additionalConfigLabel}
+                    handleSubmit={handleCloudConfig}
+                ></TextInput>
+            </WizardStep>
+
+            <WizardStep label="Select your environments" active={step === 3} done={step > 3} failed={step > 3 && environmentsToConfigure.length === 0}>
                 <MultiSelect
                     text="Select the environments you'd like to use with pan:"
                     options={multiSelectItems}
@@ -73,7 +133,7 @@ const Init: React.FC<InitProps> = ({}) => {
                 />
             </WizardStep>
 
-            <WizardStep label="Configure environments" active={step === 2} done={step === 3}>
+            <WizardStep label="Configure environments" active={step === 4} done={step === 4}>
                 <Box flexDirection="column">
                     {environmentsToConfigure.map((env, i) => (
                         <ConfigureEnvironment
@@ -81,13 +141,14 @@ const Init: React.FC<InitProps> = ({}) => {
                             projectName={projectName}
                             env={env}
                             active={env === activeEnvironment}
+                            additionalConfig={additionalConfig}
                             handleDone={handleEnvironmentConfigured}
                         />
                     ))}
                 </Box>
             </WizardStep>
 
-            <Box display={ step === 3 ? "flex" : undefined} flexDirection="column" marginTop={1}>
+            <Box display={ step === 5 ? "flex" : undefined} flexDirection="column" marginTop={1}>
                 <Box marginBottom={1}>
                     <Text>
                         🎉 You are set up to use pan!

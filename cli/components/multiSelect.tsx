@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Text, Box, useInput } from "ink";
 import figures from "figures";
 
-interface MultiSelectOption {
+export interface MultiSelectOption {
     label: string;
     value: string;
 }

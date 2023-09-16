@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Text } from "ink";
-import { environment } from "./core/next/index.js";
+import { project } from "./core/framework/index.js";
 
 interface WrapperProps {
     children: React.ReactNode;
@@ -10,7 +10,7 @@ const Wrapper: React.FC<WrapperProps> = ({ children }) => {
     const [isValidProject, setIsValidProject] = useState(false);
 
     useEffect(() => {
-        const isNextJS = environment.isNextJSProject();
+        const isNextJS = project.isValidProject();
         setIsValidProject(isNextJS);
     }, []);
 
@@ -18,7 +18,7 @@ const Wrapper: React.FC<WrapperProps> = ({ children }) => {
         return(
             <Box>
                 <Text>
-                    Not a valid next.js project
+                    Not a valid project
                 </Text>
             </Box>
         );

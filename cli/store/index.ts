@@ -1,5 +1,6 @@
 import toolkit, { ThunkAction, Action } from "@reduxjs/toolkit";
 import environmentReducer from "./enviroment.js";
+import pulumiReducer from "./pulumi.js";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
 const { configureStore } = toolkit;
@@ -11,6 +12,7 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 export const store = configureStore({
     reducer: {
         enviroments: environmentReducer,
+        pulumi: pulumiReducer,
     },
 });
 

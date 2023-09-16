@@ -8,7 +8,7 @@ export async function runCommand(...cmd: string[]) {
             }
 
             if (stderr) {
-                return rej(stderr);
+                return res(stderr);
             }
 
             return res(stdout);

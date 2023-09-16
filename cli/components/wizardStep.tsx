@@ -39,7 +39,7 @@ const WizardStep: React.FC<WizardStepProps> = ({ label, children, active, done, 
             </Box>
 
             <Box flexDirection="column" marginLeft={3} display={ active ? "flex" : undefined}>
-                {children}
+                {active ? children : undefined }
             </Box>
         </Box>
     );

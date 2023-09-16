@@ -11,6 +11,7 @@ interface ConfigureEnvironmentProps {
     projectName: string;
     env: string;
     active: boolean;
+    additionalConfig: Record<string, string>;
     handleDone: (env: string) => void;
 }
 

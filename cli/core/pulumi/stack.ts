@@ -1,4 +1,6 @@
 import * as pulumi from "@pulumi/pulumi";
+import { exec, file } from "../utils/index.js";
+
 const { automation } = pulumi;
 
 export type ConfigMap = pulumi.automation.ConfigMap;
@@ -18,4 +20,21 @@ export async function initStack(projectName: string, stackName: string): Promise
 export async function setInitialStackConfig(stack: pulumi.automation.Stack, config: pulumi.automation.ConfigMap): Promise<void> {
     await stack.setAllConfig(config);
     await stack.up({ message: "Setting initial configuration values" });
+}
+
+export async function refreshConfigForEject(stackName: string): Promise<void> {
+    await exec.runCommand("pulumi", "--cwd", "./infrastructure", "stack", "select", stackName);
+    await exec.runCommand("pulumi", "--cwd", "./infrastructure", "config", "refresh", "-f")
+}
+
+export async function refreshConfigsEject(stacks: string[]): Promise<void> {
+    const current = stacks.shift();
+    if (!current) {
+        return;
+    }
+
+    file.writeFileToString(`./infrastructure/Pulumi.${current}.yaml`, "");
+    await refreshConfigForEject(current);
+
+    return await refreshConfigsEject(stacks);
 }

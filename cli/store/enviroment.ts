@@ -1,7 +1,7 @@
 import store from "@reduxjs/toolkit";
 import { RootState } from "./index.js";
 import { file } from "../core/utils/index.js";
-import { environment } from "../core/next/index.js";
+import { environment } from "../core/framework/index.js";
 import { stack } from "../core/pulumi/index.js";
 
 const { createSlice, createAsyncThunk } = store;
@@ -14,7 +14,7 @@ export interface EnvironmentsState {
 }
 
 const initialState = (): EnvironmentsState => {
-    const envs = environment.readNextEnvironment();
+    const envs = environment.readEnvironment();
     const projectName = JSON.parse(file.readFileToString("package.json")).name;
 
     return {

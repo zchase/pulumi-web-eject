@@ -1,19 +1,10 @@
 import { file } from "../utils/index.js";
 
-export function isNextJSProject(): boolean {
-    try {
-        file.readFileToString("./next.config.js");
-        return true;
-    } catch (e) {
-        return false;
-    }
-}
-
 export interface NextEnvironment {
     [key: string]: string;
 }
 
-export function readNextEnvironment(): Record<string, NextEnvironment> {
+export function readEnvironment(): Record<string, NextEnvironment> {
     const envs = file.readCurrentDirectory().filter((f) => f.indexOf(".env.") === 0);
 
     const result: Record<string, NextEnvironment> = {};
@@ -25,17 +16,17 @@ export function readNextEnvironment(): Record<string, NextEnvironment> {
             continue;
         }
 
-        result[envName] = parseNextEnvironment(file.readFileToString(env));
+        result[envName] = parseEnvironment(file.readFileToString(env));
     }
 
     return result;
 }
 
-export function readNextEnvironmentFile(env: string): NextEnvironment {
-    return parseNextEnvironment(file.readFileToString(`.env.${env}`));
+export function readEnvironmentFile(env: string): NextEnvironment {
+    return parseEnvironment(file.readFileToString(`.env.${env}`));
 }
 
-export function parseNextEnvironment(env: string): NextEnvironment {
+export function parseEnvironment(env: string): NextEnvironment {
     return env.split("\n").reduce((config, item) => {
         const parts = item.split("=");
         const key = parts[0]
