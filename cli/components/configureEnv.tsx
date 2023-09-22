@@ -11,11 +11,11 @@ interface ConfigureEnvironmentProps {
     projectName: string;
     env: string;
     active: boolean;
-    additionalConfig: Record<string, string>;
+    additionalConfig: Record<string, { value: string; secret: boolean; }>;
     handleDone: (env: string) => void;
 }
 
-const ConfigureEnvironment: React.FC<ConfigureEnvironmentProps> = ({ projectName, env, active, handleDone }) => {
+const ConfigureEnvironment: React.FC<ConfigureEnvironmentProps> = ({ projectName, env, active, handleDone, additionalConfig }) => {
     const dispatch = useAppDispatch();
     const environment = useAppSelector(getEnvironment(env));
     const configuredEnvironments = useAppSelector(getConfiguredEnvironments);
@@ -49,7 +49,7 @@ const ConfigureEnvironment: React.FC<ConfigureEnvironmentProps> = ({ projectName
         dispatch(configureEnvironment({
             projectName,
             env,
-            config,
+            config: Object.assign({}, config, additionalConfig),
         }));
     };
 

@@ -17,7 +17,7 @@ interface InitProps {
 const Init: React.FC<InitProps> = ({}) => {
     const [step, setStep] = useState(1);
     const [cloud, setCloud] = useState<Cloud | undefined>();
-    const [additionalConfig, setAdditionalConfig] = useState<Record<string, string>>({});
+    const [additionalConfig, setAdditionalConfig] = useState<Record<string, { value: string; secret: boolean; }>>({});
     const [additionalConfigLabel, setAdditionalConfigLabel] = useState("");
     const [environmentsToConfigure, setEnvironmentsToConfigure] = useState<string[]>([]);
     const [activeEnvironment, setActiveEnvironment] = useState("");
@@ -85,18 +85,18 @@ const Init: React.FC<InitProps> = ({}) => {
     };
 
     const handleCloudConfig = (value: string) => {
-        const config: Record<string, string> = {};
+        const config: Record<string, { value: string; secret: boolean; }> = {};
 
         if (cloud === "aws") {
-            config["aws:region"] = value;
+            config["aws:region"] = { value, secret: false };
         }
 
         if (cloud === "azure") {
-            config["azure:location"] = value;
+            config["azure:location"] = { value, secret: false };
         }
 
         if (cloud === "gcp") {
-            config["gcp:project"] = value;
+            config["gcp:project"] = { value, secret: false };
         }
 
         setAdditionalConfig(config);
