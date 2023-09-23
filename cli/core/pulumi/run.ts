@@ -29,8 +29,8 @@ export async function updateStack(stack: pulumi.automation.Stack, logger: Pulumi
     await stack.up({ onOutput: logger });
 }
 
-export async function previewStack(stack: pulumi.automation.Stack, _logger: PulumiLogHanlder) {
-    await stack.preview({});
+export async function previewStack(stack: pulumi.automation.Stack, logger: PulumiLogHanlder) {
+    await stack.preview({ onOutput: logger });
 }
 
 export async function destroyStack(stack: pulumi.automation.Stack, logger: PulumiLogHanlder) {
