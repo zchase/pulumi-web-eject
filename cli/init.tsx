@@ -11,7 +11,7 @@ import TextInput from "./components/textInput.js";
 type Cloud = "aws" | "azure" | "gcp";
 
 interface InitProps {
-
+    cliArgs: {};
 }
 
 const Init: React.FC<InitProps> = ({}) => {
@@ -56,7 +56,7 @@ const Init: React.FC<InitProps> = ({}) => {
 
     const handleEnvironmentConfigured = (env: string) => {
         const nextIndex = environmentsToConfigure.indexOf(env) + 1;
-        if (environmentsToConfigure[nextIndex]) {
+        if (activeEnvironment === env && environmentsToConfigure[nextIndex]) {
             setActiveEnvironment(environmentsToConfigure[nextIndex]!);
         }
     };
@@ -133,7 +133,7 @@ const Init: React.FC<InitProps> = ({}) => {
                 />
             </WizardStep>
 
-            <WizardStep label="Configure environments" active={step === 4} done={step === 4}>
+            <WizardStep label="Configure environments" active={step === 4} done={step > 4}>
                 <Box flexDirection="column">
                     {environmentsToConfigure.map((env, i) => (
                         <ConfigureEnvironment

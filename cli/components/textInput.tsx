@@ -10,13 +10,15 @@ const TextInput: React.FC<TextInputProps> = ({ label, handleSubmit }) => {
     const [value, setValue] = useState("");
 
     useInput((input, key) => {
-        if (key.backspace) {
+        if ((key.backspace || key.delete) && value !== "") {
             const newValue = value.slice(0, -1);
             setValue(newValue);
+            return;
         }
 
         if (key.return) {
             handleSubmit(value);
+            return;
         }
 
         const newValue = value + input;
