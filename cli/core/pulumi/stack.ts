@@ -22,11 +22,15 @@ export async function setInitialStackConfig(stack: pulumi.automation.Stack, conf
     await stack.up({ message: "Setting initial configuration values" });
 }
 
+// refreshConfigForEject will grab the currenlty set config in Pulumi Cloud
+// and update the corresponding Pulumi.*.yaml file.
 export async function refreshConfigForEject(stackName: string): Promise<void> {
     await exec.runCommand("pulumi", "--cwd", "./infrastructure", "stack", "select", stackName);
     await exec.runCommand("pulumi", "--cwd", "./infrastructure", "config", "refresh", "-f")
 }
 
+// refreshConfigsEject takes a list of stack names and writes out an updated
+// config from Pulumi Cloud.
 export async function refreshConfigsEject(stacks: string[]): Promise<void> {
     const current = stacks.shift();
     if (!current) {

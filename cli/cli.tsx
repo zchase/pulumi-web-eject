@@ -56,8 +56,13 @@ app.addCommand({
 app.addCommand({
 	name: "destroy",
 	description: "destroy the resources in your environment",
-	options: (yargs) => yargs,
-	handler: (_args) => renderView(Destroy),
+	options: (yargs) => yargs
+		.option("environment", {
+			alias: "e",
+			type: "string",
+			describe: "The environment you want to deploy into."
+		}),
+	handler: (args) => renderView(Destroy, args),
 });
 
 app.addCommand({

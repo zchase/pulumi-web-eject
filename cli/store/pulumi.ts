@@ -1,22 +1,22 @@
-import store from "@reduxjs/toolkit";
+import store, { PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./index.js";
 import { file } from "../core/utils/index.js";
 import { cmd } from "../core/index.js";
 
 const { createSlice, createAsyncThunk } = store;
 
-interface PulumiAction {
-    type: "preview" | "update" | "destroy";
-    messages: string[];
+interface PulumiActionMessage {
+    name: string;
+    resource: string;
+    status: string;
 }
 
 export interface PulumiState {
     projectName: string;
     stackName: string;
-    actions: PulumiAction[];
-    currentAction: PulumiAction | undefined;
     error: string | undefined;
     isEjected: boolean;
+    messages: { [key: string]: PulumiActionMessage };
 }
 
 const initialState = (): PulumiState => {
@@ -25,8 +25,7 @@ const initialState = (): PulumiState => {
     return {
         projectName,
         stackName: "",
-        actions: [],
-        currentAction: undefined,
+        messages: {},
         error: undefined,
         isEjected: false,
     };
@@ -46,25 +45,20 @@ export const pulumiSlice = createSlice({
             });
     },
     reducers: {
-        setStackName: (state, action) => {
+        setStackName: (state, action: PayloadAction<string>) => {
             state.stackName = action.payload;
+        },
+        addMessage: (state, action: PayloadAction<{ key: string; message: PulumiActionMessage }>) => {
+            state.messages[action.payload.key] = action.payload.message;
         },
     },
 });
 
 export const getProjectName = (state: RootState) => state.pulumi.projectName;
 export const getStackName = (state: RootState) => state.pulumi.stackName;
-export const getCurrentAction = (state: RootState) => state.pulumi.currentAction;
 export const getPulumiError = (state: RootState) => state.pulumi.error;
 export const getIsEjected = (state: RootState) => state.pulumi.isEjected;
-
-interface PulumiActionArgs {}
-
-export const runPreview = createAsyncThunk("pulumi/runPreview", async (_args: PulumiActionArgs) => {});
-
-export const runUpdate = createAsyncThunk("pulumi/runUpdate", async (_args: PulumiActionArgs) => {});
-
-export const runDestroy = createAsyncThunk("pulumi/runDestroy", async (_args: PulumiActionArgs) => {});
+export const getMessages = (state: RootState) => state.pulumi.messages;
 
 interface EjectProgramArgs {
     projectName: string;
@@ -75,4 +69,5 @@ export const ejectProgram = createAsyncThunk("pulumi/ejectProgram", async (args:
     return await cmd.eject.ejectProgram(args.projectName, args.environments);
 });
 
+export const { setStackName, addMessage } = pulumiSlice.actions;
 export default pulumiSlice.reducer;
